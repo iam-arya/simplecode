@@ -1,0 +1,37 @@
+# Use the official NGINX base image
+FROM nginx:latest
+
+# Copy custom configuration file to the container
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy your website's static files to the container
+COPY html /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Command to run NGINX
+CMD ["nginx", "-g", "daemon off;"]
+
+
+Create the NGINX Configuration File:
+
+Create an nginx.conf file if you need a custom configuration. For a basic setup, the default configuration included in the NGINX image might be sufficient.
+
+Build the Docker Image:
+
+docker build -t mynginx:1.0 .
+
+In this command:
+
+docker build is the command to build a Docker image.
+-t mynginx:1.0 tags the image with the name mynginx and the version 1.0.
+. specifies the current directory as the build context.
+Run the Docker Container:
+
+Once the image is built, you can run it with:
+
+docker run -d -p 8080:80 mynginx:1.0
+
+
+Navigate to the directory containing your Dockerfile, and run the following command:
