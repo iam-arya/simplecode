@@ -1,0 +1,126 @@
+Yes, you can deploy Sysdig in a Kubernetes cluster without using Helm. Helm is a popular package manager for Kubernetes, but it is not mandatory for deploying applications. Here’s a general guide to deploying Sysdig without Helm:
+
+Create a Sysdig Namespace:
+Create a namespace in your Kubernetes cluster for Sysdig resources
+
+# kubectl create namespace sysdig
+
+
+2, Create a Service Account:
+Create a service account for Sysdig with the necessary permissions.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sysdig-agent
+  namespace: sysdig
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sysdig-agent
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/proxy", "nodes/stats", "configmaps", "services"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["events", "pods"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sysdig-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sysdig-agent
+subjects:
+  - kind: ServiceAccount
+    name: sysdig-agent
+    namespace: sysdig
+
+3.Apply this configuration
+kubectl apply -f sysdig-service-account.yaml
+
+3.
+Create the Sysdig Agent DaemonSet:
+Define a DaemonSet for the Sysdig agent. Replace <ACCESS_KEY> with your Sysdig access key
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sysdig-agent
+  namespace: sysdig
+spec:
+  selector:
+    matchLabels:
+      app: sysdig-agent
+  template:
+    metadata:
+      labels:
+        app: sysdig-agent
+    spec:
+      serviceAccountName: sysdig-agent
+      containers:
+        - name: sysdig-agent
+          image: sysdig/agent:latest
+          env:
+            - name: ACCESS_KEY
+              value: "<ACCESS_KEY>"
+            - name: COLLECTOR
+              value: "collector.sysdigcloud.com"
+            - name: COLLECTOR_PORT
+              value: "6443"
+            - name: SECURE
+              value: "true"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 200m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /host/proc
+              name: proc
+              readOnly: true
+            - mountPath: /host/sys/kernel/debug
+              name: debugfs
+              readOnly: true
+            - mountPath: /var/run/docker.sock
+              name: dockersocket
+          securityContext:
+            privileged: true
+      volumes:
+        - name: proc
+
+
+
+          hostPath:
+            path: /proc
+        - name: debugfs
+          hostPath:
+            path: /sys/kernel/debug
+        - name: dockersocket
+          hostPath:
+            path: /var/run/docker.sock
+
+apply conf
+kubectl apply -f sysdig-agent-daemonset.yaml
+
+4.
+
+Verify the Deployment:
+Check if the Sysdig agent pods are running correctly.
+
+kubectl get pods -n sysdig
+
+By following these steps, you can deploy Sysdig in your Kubernetes cluster without using Helm. Adjust the configurations as needed to fit your specific requirements.
+
+
+
+
+
+
+
+
