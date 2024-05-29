@@ -1,0 +1,15 @@
+# Use UBI 9 minimal as the base image
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+# Install NGINX and other necessary packages
+RUN microdnf install -y nginx && \
+    microdnf clean all
+
+# Copy your NGINX configuration file (if you have one)
+COPY my-nginx-config.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start NGINX
+CMD ["nginx", "-g", "daemon off;"]
