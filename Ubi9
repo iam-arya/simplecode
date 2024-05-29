@@ -1,0 +1,14 @@
+# Use the UBI 9 NGINX image as the base
+FROM registry.access.redhat.com/ubi9/nginx-118
+
+# Copy custom NGINX configuration file
+COPY my-nginx-config.conf /etc/nginx/nginx.conf
+
+# Copy any additional files needed by your application
+COPY /path/to/your/files /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start NGINX
+CMD ["nginx", "-g", "daemon off;"]
