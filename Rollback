@@ -1,0 +1,46 @@
+bbb
+Certainly! Below is a rollback shell script based on the details you provided. This script will revert to the previous version:
+
+```bash
+#!/bin/bash
+
+# Function to find the current version
+find_version() {
+    cat $1 | grep 'ltfsre-cyclops digital banking service-preprod:v' | head -1 | awk -F':' '{print $2}' | awk -F'v' '{print $2}'
+}
+
+# Check if the script argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <filename>"
+    exit 1
+fi
+
+# Get the current version
+currentVer=$(find_version $1)
+
+# Calculate the previous version
+prevVer=$(expr $currentVer - 1)
+
+# Check if previous version is valid
+if [ "$prevVer" -lt 1 ]; then
+    echo "No previous version available to rollback."
+    exit 1
+fi
+
+echo "Current Version : v$currentVer"
+echo "Rolling back to Version : v$prevVer"
+
+# Replace the current version with the previous version in the file
+sed -i "s/:v$currentVer/:v$prevVer/g" $1
+
+echo "Rollback completed."
+```
+
+### How to use the script:
+1. Save the script to a file, for example, `rollback.sh`.
+2. Give execute permission to the script: `chmod +x rollback.sh`.
+3. Run the script with the file name as an argument: `./rollback.sh <filename>`.
+
+Replace `<filename>` with the actual file name containing the version information.
+
+This script reads the current version, calculates the previous version, and updates the file to reflect the rollback. Ensure to have a backup of your file before running the script.
