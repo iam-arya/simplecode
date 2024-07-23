@@ -43,3 +43,52 @@ Then you can run it:
 ```
 
 
+
+
+
+If you need to delete multiple deployment YAML files using a shell script, you can extend the script to iterate over a list of files. Here is a revised version of the script to handle multiple deployment files:
+
+```sh
+#!/bin/bash
+
+# Variables
+NAMESPACE="amazonlp-app-uat"
+
+# List of deployment files
+DEPLOYMENT_FILES=(
+    "vKycWithDigiLocker-enhance-service-deployment.yaml"
+    "another-service-deployment.yaml"
+    "yet-another-service-deployment.yaml"
+    # Add more deployment files as needed
+)
+
+# Iterate over each deployment file and delete it
+for DEPLOYMENT_FILE in "${DEPLOYMENT_FILES[@]}"; do
+    if [ -f "$DEPLOYMENT_FILE" ]; then
+        echo "Deleting deployment from file: $DEPLOYMENT_FILE"
+        kubectl delete -f "$DEPLOYMENT_FILE" -n "$NAMESPACE"
+    else
+        echo "Error: The file '$DEPLOYMENT_FILE' does not exist."
+    fi
+done
+```
+
+### Steps to Use the Script
+
+1. **Save the Script:**
+   Save the above script to a file, for example, `delete_deployments.sh`.
+
+2. **Make the Script Executable:**
+   ```sh
+   chmod +x delete_deployments.sh
+   ```
+
+3. **Run the Script:**
+   ```sh
+   ./delete_deployments.sh
+   ```
+
+### Notes:
+- Ensure all the deployment files listed in `DEPLOYMENT_FILES` array are in the same directory where you are executing the script, or provide the correct paths to them.
+- You can add or remove files from the `DEPLOYMENT_FILES` array as needed.
+
