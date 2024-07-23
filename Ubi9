@@ -12,3 +12,34 @@ EXPOSE 80
 
 # Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
+
+
+Sure, here's a simple shell script to apply the `deployment.yaml` file to a specific namespace using `kubectl`:
+
+```sh
+#!/bin/bash
+
+# Variables
+NAMESPACE="your-namespace"
+DEPLOYMENT_FILE="deployment.yaml"
+
+# Apply the deployment
+kubectl apply -f $DEPLOYMENT_FILE -n $NAMESPACE
+
+# Check the status of the deployment
+kubectl rollout status deployment/$(basename $DEPLOYMENT_FILE .yaml) -n $NAMESPACE
+```
+
+Make sure to replace `your-namespace` with the actual namespace you want to use. Save this script to a file, for example, `deploy.sh`, and make it executable:
+
+```sh
+chmod +x deploy.sh
+```
+
+Then you can run it:
+
+```sh
+./deploy.sh
+```
+
+
